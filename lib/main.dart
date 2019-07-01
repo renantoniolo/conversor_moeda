@@ -5,28 +5,46 @@ import 'dart:convert';
 
 const request = "https://api.hgbrasil.com/finance/quotations?key=78286f67";
 
+// Inicia o aplicativo
+// MaterialApp contem todos os widget necessários para montar um app
 void main() async {
-  print(await getData());
-
   runApp(MaterialApp(
     home: Home(),
     theme: ThemeData(hintColor: Colors.amber, primaryColor: Colors.white),
   ));
 }
 
+
+class Teste extends StatefulWidget {
+  @override
+  _TesteState createState() => _TesteState();
+}
+
+class _TesteState extends State<Teste> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      
+    );
+  }
+}
+
+// Widget que tenha estado mutável (pode sofrer alteração)
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  final realController = TextEditingController();
-  final dolarController = TextEditingController();
-  final euroController = TextEditingController();
+
+  TextEditingController realController = TextEditingController();
+  TextEditingController dolarController = TextEditingController();
+  TextEditingController euroController = TextEditingController();
 
   double dolar;
   double euro;
 
+  // metodo onChanged, para retornar a cotação atual Real
   void _realChange(String text) {
     if (text.isEmpty) _clearControllerText();
     double real = double.parse(text);
@@ -34,6 +52,7 @@ class _HomeState extends State<Home> {
     euroController.text = (real / euro).toStringAsFixed(2);
   }
 
+  // metodo onChanged, para retornar a cotação atual Dolar
   void _dolarChange(String text) {
     if (text.isEmpty) _clearControllerText();
     double dolar = double.parse(text);
@@ -41,6 +60,7 @@ class _HomeState extends State<Home> {
     euroController.text = (dolar * this.dolar / euro).toStringAsFixed(2);
   }
 
+  // metodo onChanged, para retornar a cotação atual Euro
   void _euroChange(String text) {
     if (text.isEmpty) _clearControllerText();
     double euro = double.parse(text);
@@ -48,12 +68,14 @@ class _HomeState extends State<Home> {
     dolarController.text = (euro * this.euro / dolar).toStringAsFixed(2);
   }
 
+  // Meotodo para limpar os TextField`s
   void _clearControllerText() {
     realController.text = "";
     dolarController.text = "";
     euroController.text = "";
   }
 
+// Designer da view iniciada sobre um Scaffold
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,6 +145,7 @@ class _HomeState extends State<Home> {
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           onPressed: () {
+                            // metodo para limpar os TextField`s
                             _clearControllerText();
                           },
                         ),
@@ -137,11 +160,13 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Metodo para retornar uma widget `TextField`
   Widget buildTextField(
       String label, String prefix, TextEditingController ctrl, Function func) {
+        // Retorna um widget TextField
     return TextField(
         controller: ctrl,
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         onChanged: func,
         decoration: InputDecoration(
             labelText: label,
@@ -151,11 +176,15 @@ class _HomeState extends State<Home> {
             border: OutlineInputBorder(),
             prefixText: prefix),
         textAlign: TextAlign.start,
+        cursorColor: Colors.white,
         style: TextStyle(color: Colors.amber));
   }
 }
 
+// Metodo para buscar cotaçoes atuais de cada moeda  
 Future<Map> getData() async {
+  // busca na requesiçao via rest Http
   http.Response response = await http.get(request);
+  // retorna a chamada em json
   return json.decode(response.body);
 }
